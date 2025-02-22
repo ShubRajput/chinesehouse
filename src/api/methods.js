@@ -1,5 +1,5 @@
 import instance from "./instance";
-import { ENDPOINTS } from "./endpoints";
+import { ENDPOINTS } from "./endpoint";
 
 export const API = {
   menu: {

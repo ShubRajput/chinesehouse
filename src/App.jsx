@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from './components/Header';
 import MenuItem from './components/MenuItem';
 import CategoryCard from './components/CategoryCard';
 import Cart from './components/Cart';
 import Footer from './components/Footer';
 import { menuData } from './data/menuData';
+import { useSearchParams } from "react-router-dom";
+import { API } from './api/methods';
 
 function App() {
+  const [searchParams] = useSearchParams(); 
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [orders, setOrders] = useState([]);
@@ -45,6 +48,30 @@ function App() {
       return order;
     }));
   };
+
+  const createSession = async (tableNumber) => {
+    try {
+      console.log("Sending table number:", tableNumber);
+      const response = await API.session.getSession({ tableNumber });
+      console.log("Session Created:", response);
+      if (response.sessionToken) {
+        console.log("session token  is: -->", response);
+      }
+    } catch (error) {
+      console.error("Error creating session:", error);
+    }
+  };
+
+  useEffect(() => {
+    const tableNo = searchParams.get("tableNo"); // Get the table_no from query params
+
+    if (tableNo && tableNo.trim() !== "") {
+      console.log("Creating session with table number:", tableNo);
+      createSession(tableNo);
+    } else {
+      console.error("Table number is missing or invalid");
+    }
+  }, [searchParams, ]); 
 
   return (
     <div className="min-h-screen bg-secondary flex flex-col">
