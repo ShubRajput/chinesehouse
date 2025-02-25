@@ -15,5 +15,8 @@ export const ENDPOINTS = {
     },
     ORDERS: {
       PLACEORDER: "/api/customer/order/placeorder"
+    },
+    CATEGORIES: {
+        GETMENU: "/api/admin/categories"
     }
   } 

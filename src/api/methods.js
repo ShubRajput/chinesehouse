@@ -41,4 +41,7 @@ export const API = {
       });
     },
   },
+  categories: {
+    getmenu: () => instance.get(ENDPOINTS.CATEGORIES.GETMENU),
+  },
 };
