@@ -33,7 +33,7 @@ export default function Cart({ items, onClose, onPlaceOrder }) {
               </div>
               
               <button
-                onClick={onPlaceOrder}
+                onClick={() => onPlaceOrder()}
                 className="w-full bg-orange-gradient hover:bg-orange-gradient-hover text-white py-2 rounded-lg transition-all duration-300"
               >
                 Place Order

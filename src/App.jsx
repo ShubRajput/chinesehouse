@@ -21,19 +21,44 @@ function App() {
     setCartItems([...cartItems, item]);
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
+    alert("called")
     if (cartItems.length === 0) return;
 
-    const newOrder = {
-      id: Date.now(),
-      items: [...cartItems],
-      status: "Pending",
-      total: cartItems.reduce((sum, item) => sum + item.price, 0),
+    // Format order data
+    const formatOrderData = (menuItems) => {
+      const itemMap = new Map();
+      menuItems.forEach((item) => {
+        if (itemMap.has(item._id)) {
+          itemMap.get(item._id).quantity += 1;
+        } else {
+          itemMap.set(item._id, { item: item._id, quantity: 1 });
+        }
+      });
+      return Array.from(itemMap.values());
     };
 
-    setOrders([...orders, newOrder]);
-    setCartItems([]);
-    setIsCartOpen(false);
+    const orderData = {
+      items: formatOrderData(cartItems),
+      // total: cartItems.reduce((sum, item) => sum + item.price, 0),
+    };
+
+    try {
+      console.log("data to sedn is ",orderData.items);
+      
+      const response = await API.orders.placeorder(orderData.items);
+      console.log("Order placed successfully:", response);
+
+      // Update UI after successful order placement
+      setOrders([
+        ...orders,
+        { id: Date.now(), ...orderData, status: "Pending" },
+      ]);
+      setCartItems([]);
+      setIsCartOpen(false);
+    } catch (error) {
+      console.error("Error placing order:", error);
+    }
   };
 
   const handleUpdateStatus = (orderId) => {
@@ -157,7 +182,7 @@ function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {categories
                   .find((cat) => cat._id === selectedCategory._id)
-                  ?.menuItems?.map((item) => (                  
+                  ?.menuItems?.map((item) => (
                     <MenuItem
                       key={item._id}
                       item={item}

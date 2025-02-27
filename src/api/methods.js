@@ -35,9 +35,9 @@ export const API = {
   orders: {
     placeorder: (data) => {
       instance.post(ENDPOINTS.ORDERS.PLACEORDER, {
-        sessionToken: data.sessionToken,
-        items: data.items,
-        total: data.total,
+        // sessionToken: data.sessionToken,
+        menuItems: data,
+        // total: data.total,
       });
     },
   },
