@@ -22,7 +22,6 @@ function App() {
   };
 
   const handlePlaceOrder = async () => {
-    alert("called")
     if (cartItems.length === 0) return;
 
     // Format order data
