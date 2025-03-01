@@ -19,7 +19,7 @@ export const API = {
     addToCart: (data) =>
       instance.post(ENDPOINTS.CART.ADDTOCART, {
         sessionToken: data.sessionToken,
-        dishId: data.dishId,
+        menuId: data.menuId,
         quantity: data.quantity,
       }),
     removeFromCart: (data) =>

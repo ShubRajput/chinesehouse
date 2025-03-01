@@ -4,11 +4,11 @@ import MenuItem from "./components/MenuItem";
 import CategoryCard from "./components/CategoryCard";
 import Cart from "./components/Cart";
 import Footer from "./components/Footer";
-import { menuData } from "./data/menuData";
 import { useSearchParams } from "react-router-dom";
 import { API } from "./api/methods";
 
 function App() {
+  const [sessionToken, setSessionToken] = useState(null);
   const [searchParams] = useSearchParams();
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -17,8 +17,25 @@ function App() {
   const [showOrders, setShowOrders] = useState(false);
   const [categories, setCategories] = useState([]);
 
-  const handleAddToCart = (item) => {
-    setCartItems([...cartItems, item]);
+  const handleAddToCart = async (item) => {
+    if (!sessionToken) {
+      console.error("Session token is missing. Cannot add to cart.");
+      return;
+    }
+  console.log("item is ----->",item._id);
+  
+    try {
+      const response = await API.cart.addToCart({
+        sessionToken,
+        menuId: item._id,
+        quantity: "1", // Default to 1, modify as needed
+      });
+  
+      console.log("Added to cart successfully:", response);
+      setCartItems([...cartItems, item]); // Update local state if needed
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+    }
   };
 
   const handlePlaceOrder = async () => {
@@ -82,7 +99,7 @@ function App() {
       const response = await API.session.getSession({ tableNumber });
       console.log("Session Created:", response);
       if (response.sessionToken) {
-        console.log("session token  is: -->", response);
+        setSessionToken(response.sessionToken); // Store sessionToken
       }
     } catch (error) {
       console.error("Error creating session:", error);
