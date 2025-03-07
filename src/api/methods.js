@@ -25,7 +25,7 @@ export const API = {
     removeFromCart: (data) =>
       instance.post(ENDPOINTS.CART.REMOVEFROMCART, {
         sessionToken: data.sessionToken,
-        dishId: data.dishId,
+        menuId: data.menuId,
       }),
     fetchFromCart: (data) =>
       instance.post(ENDPOINTS.CART.FETCHFROMCART, {

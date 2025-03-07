@@ -8,7 +8,7 @@ import { useSearchParams } from "react-router-dom";
 import { API } from "./api/methods";
 
 function App() {
-  const [sessionToken, setSessionToken] = useState(null);
+  const [sessionToken, setSessionToken] = useState("");
   const [searchParams] = useSearchParams();
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -22,15 +22,14 @@ function App() {
       console.error("Session token is missing. Cannot add to cart.");
       return;
     }
-  console.log("item is ----->",item._id);
-  
+
     try {
       const response = await API.cart.addToCart({
         sessionToken,
         menuId: item._id,
         quantity: "1", // Default to 1, modify as needed
       });
-  
+
       console.log("Added to cart successfully:", response);
       setCartItems([...cartItems, item]); // Update local state if needed
     } catch (error) {
@@ -39,43 +38,51 @@ function App() {
   };
 
   const handlePlaceOrder = async () => {
-    if (cartItems.length === 0) return;
-
-    // Format order data
-    const formatOrderData = (menuItems) => {
-      const itemMap = new Map();
-      menuItems.forEach((item) => {
-        if (itemMap.has(item._id)) {
-          itemMap.get(item._id).quantity += 1;
-        } else {
-          itemMap.set(item._id, { item: item._id, quantity: 1 });
-        }
-      });
-      return Array.from(itemMap.values());
-    };
-
-    const orderData = {
-      items: formatOrderData(cartItems),
-      // total: cartItems.reduce((sum, item) => sum + item.price, 0),
-    };
-
     try {
-      console.log("data to sedn is ",orderData.items);
+      console.log("Fetching latest cart items before placing order...");
+      const response = await API.cart.fetchFromCart({ sessionToken });
+      const latestCartItems = response.cart; // Get the latest cart from the backend
       
-      const response = await API.orders.placeorder(orderData.items);
-      console.log("Order placed successfully:", response);
-
-      // Update UI after successful order placement
+      console.log("Updated Cart items:", latestCartItems);
+      
+      if (!latestCartItems || latestCartItems.length === 0) {
+        console.error("Cart is empty, cannot place order.");
+        return;
+      }
+  
+      // Format order data
+      const formatOrderData = (menuItems) => {
+        const itemMap = new Map();
+        menuItems.forEach((item) => {
+          if (itemMap.has(item._id)) {
+            itemMap.get(item._id).quantity += 1;
+          } else {
+            itemMap.set(item._id, { item: item._id, quantity: 1 });
+          }
+        });
+        return Array.from(itemMap.values());
+      };
+  
+      const orderData = {
+        items: formatOrderData(latestCartItems),
+        sessionToken,
+      };
+      console.log("orderData is", orderData);
+      
+      const orderResponse = await API.orders.placeorder(orderData);
+      console.log("Order placed successfully:", orderResponse);
+  
       setOrders([
         ...orders,
         { id: Date.now(), ...orderData, status: "Pending" },
       ]);
-      setCartItems([]);
+      setCartItems([]); // Clear local cart state
       setIsCartOpen(false);
     } catch (error) {
       console.error("Error placing order:", error);
     }
   };
+  
 
   const handleUpdateStatus = (orderId) => {
     setOrders(
@@ -100,6 +107,7 @@ function App() {
       console.log("Session Created:", response);
       if (response.sessionToken) {
         setSessionToken(response.sessionToken); // Store sessionToken
+        console.log("session token is :---->", sessionToken);
       }
     } catch (error) {
       console.error("Error creating session:", error);
@@ -279,6 +287,7 @@ function App() {
 
       {isCartOpen && (
         <Cart
+          sessionToken={sessionToken}
           items={cartItems}
           onClose={() => setIsCartOpen(false)}
           onPlaceOrder={handlePlaceOrder}
