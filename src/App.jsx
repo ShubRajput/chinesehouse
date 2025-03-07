@@ -39,39 +39,14 @@ function App() {
 
   const handlePlaceOrder = async () => {
     try {
-      console.log("Fetching latest cart items before placing order...");
-      const response = await API.cart.fetchFromCart({ sessionToken });
-      const latestCartItems = response.cart; // Get the latest cart from the backend
-      
-      console.log("Updated Cart items:", latestCartItems);
-      
-      if (!latestCartItems || latestCartItems.length === 0) {
-        console.error("Cart is empty, cannot place order.");
-        return;
-      }
-  
-      // Format order data
-      const formatOrderData = (menuItems) => {
-        const itemMap = new Map();
-        menuItems.forEach((item) => {
-          if (itemMap.has(item._id)) {
-            itemMap.get(item._id).quantity += 1;
-          } else {
-            itemMap.set(item._id, { item: item._id, quantity: 1 });
-          }
-        });
-        return Array.from(itemMap.values());
-      };
-  
       const orderData = {
-        items: formatOrderData(latestCartItems),
         sessionToken,
       };
       console.log("orderData is", orderData);
-      
-      const orderResponse = await API.orders.placeorder(orderData);
+
+      const orderResponse = await API.orders.placeorder(sessionToken);
       console.log("Order placed successfully:", orderResponse);
-  
+
       setOrders([
         ...orders,
         { id: Date.now(), ...orderData, status: "Pending" },
@@ -82,7 +57,6 @@ function App() {
       console.error("Error placing order:", error);
     }
   };
-  
 
   const handleUpdateStatus = (orderId) => {
     setOrders(
