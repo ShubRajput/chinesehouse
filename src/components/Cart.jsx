@@ -42,7 +42,13 @@ export default function Cart({
       });
 
       console.log("Added to cart successfully:", response);
-      setCartItems([...cartItems, item]); // Update local state if needed
+      setCartItems((prevItems) =>
+        prevItems.map((cartItem) =>
+          cartItem.menuId === item.menuId
+            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            : cartItem
+        )
+      );
     } catch (error) {
       console.error("Error adding to cart:", error);
     }
@@ -61,7 +67,13 @@ export default function Cart({
       });
 
       console.log("removed to cart successfully:", response);
-      setCartItems([...cartItems, item]); // Update local state if needed
+      setCartItems((prevItems) =>
+        prevItems.map((cartItem) =>
+          cartItem.menuId === item.menuId
+            ? { ...cartItem, quantity: cartItem.quantity - 1 }
+            : cartItem
+        )
+      );
     } catch (error) {
       console.error("Error adding to cart:", error);
     }
