@@ -127,12 +127,13 @@ function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category) => (
               <CategoryCard
-                key={category._id}
-                category={category.name}
-                imageUrl={category.imageUrl}
-                items={category.menuItems}
-                onCategoryClick={() => setSelectedCategory(category)}
-              />
+              key={category._id}
+              categoryName={category.name} // Pass category name as a separate prop
+              imageUrl={category.imageUrl}
+              items={category.menuItems}
+              onCategoryClick={() => setSelectedCategory(category)}
+            />
+            
             ))}
           </div>
         ) : (
