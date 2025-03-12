@@ -38,6 +38,11 @@ export const API = {
         sessionToken: data
       });
     },
+    getsessionorders: (data) => {
+      return instance.post(ENDPOINTS.ORDERS.GETSESSIONORDERS, {
+        sessionToken: data.sessionToken
+      })
+    }
   },
   categories: {
     getmenu: () => instance.get(ENDPOINTS.CATEGORIES.GETMENU),

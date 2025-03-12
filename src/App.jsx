@@ -36,6 +36,9 @@ function App() {
       console.error("Error adding to cart:", error);
     }
   };
+  useEffect(() => {
+    console.log("ORder state isn ", orders);
+  }, [orders]);
 
   const handlePlaceOrder = async () => {
     try {
@@ -58,20 +61,26 @@ function App() {
     }
   };
 
-  const handleUpdateStatus = (orderId) => {
-    setOrders(
-      orders.map((order) => {
-        if (order.id === orderId) {
-          const nextStatus = {
-            Pending: "Preparing",
-            Preparing: "Ready",
-            Ready: "Ready",
-          }[order.status];
-          return { ...order, status: nextStatus };
-        }
-        return order;
-      })
-    );
+
+
+  const fetchOrders = async () => {
+    if (!sessionToken) {
+      console.error("Session token is missing. Cannot fetch orders.");
+      return;
+    }
+
+    try {
+      const response = await API.orders.getsessionorders({ sessionToken });
+      console.log("Fetched orders:", response);
+      setOrders(response.orders); // Update the orders state with the fetched orders
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  const handleOrdersClick = async () => {
+    setShowOrders(true);
+    await fetchOrders(); // Fetch orders when the user opens the orders section
   };
 
   const createSession = async (tableNumber) => {
@@ -119,7 +128,7 @@ function App() {
       <Header
         cartCount={cartItems.length}
         onCartClick={() => setIsCartOpen(true)}
-        onOrdersClick={() => setShowOrders(true)}
+        onOrdersClick={handleOrdersClick}
       />
 
       <main className="container mx-auto px-4 py-8 flex-grow">
@@ -127,13 +136,12 @@ function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category) => (
               <CategoryCard
-              key={category._id}
-              categoryName={category.name} // Pass category name as a separate prop
-              imageUrl={category.imageUrl}
-              items={category.menuItems}
-              onCategoryClick={() => setSelectedCategory(category)}
-            />
-            
+                key={category._id}
+                categoryName={category.name} // Pass category name as a separate prop
+                imageUrl={category.imageUrl}
+                items={category.menuItems}
+                onCategoryClick={() => setSelectedCategory(category)}
+              />
             ))}
           </div>
         ) : (
@@ -213,19 +221,23 @@ function App() {
               <p className="text-center text-gray-500 py-8">No orders yet</p>
             ) : (
               <div className="space-y-4">
-                {orders.map((order) => (
+                {(orders || []).map((order, index) => (
                   <div
-                    key={order.id}
+                    key={order._id}
                     className="bg-white bg-opacity-5 backdrop-blur-lg rounded-lg p-6 border border-gray-200"
                   >
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="font-semibold">Order #{order.id}</p>
-                        <p className="text-primary">Total: ₹{order.total}</p>
+                        <p className="font-semibold">Order #{index + 1}</p>{" "}
+                        {/* Show Order Number */}
+                        <p className="text-primary">
+                          Total: ₹{order.totalPrice}
+                        </p>
                         <div className="mt-2">
-                          {order.items.map((item, index) => (
+                          {(order.menuItems || []).map((item, index) => (
                             <p key={index} className="text-sm text-gray-600">
-                              {item.name}
+                              {item.item.name} - ₹{item.item.price} x{" "}
+                              {item.quantity}
                             </p>
                           ))}
                         </div>
@@ -239,17 +251,7 @@ function App() {
                               ? "text-yellow-500"
                               : "text-blue-500"
                           }`}
-                        >
-                          {order.status}
-                        </p>
-                        {order.status !== "Ready" && (
-                          <button
-                            onClick={() => handleUpdateStatus(order.id)}
-                            className="mt-2 text-sm text-primary hover:text-primary/80"
-                          >
-                            Update Status
-                          </button>
-                        )}
+                        ></p>
                       </div>
                     </div>
                   </div>

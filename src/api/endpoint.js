@@ -14,7 +14,8 @@ export const ENDPOINTS = {
       FETCHFROMCART: "/api/customer/getCartItems"
     },
     ORDERS: {
-      PLACEORDER: "/api/customer/order/placeorder"
+      PLACEORDER: "/api/customer/order/placeorder",
+      GETSESSIONORDERS: "/api/customer/getorders"
     },
     CATEGORIES: {
         GETMENU: "/api/admin/categories"
