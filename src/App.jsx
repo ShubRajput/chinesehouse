@@ -6,6 +6,7 @@ import Cart from "./components/Cart";
 import Footer from "./components/Footer";
 import { useSearchParams } from "react-router-dom";
 import { API } from "./api/methods";
+import { showAlert } from "./alerts/alerts";
 
 function App() {
   const [sessionToken, setSessionToken] = useState("");
@@ -32,7 +33,9 @@ function App() {
 
       console.log("Added to cart successfully:", response);
       setCartItems([...cartItems, item]); // Update local state if needed
+      showAlert("Wohoo! Item added in cart!", "success")
     } catch (error) {
+      showAlert("Sorry! Something Went Wrong", "error")
       console.error("Error adding to cart:", error);
     }
   };
@@ -48,7 +51,6 @@ function App() {
       console.log("orderData is", orderData);
 
       const orderResponse = await API.orders.placeorder(sessionToken);
-      console.log("Order placed successfully:", orderResponse);
 
       setOrders([
         ...orders,
@@ -56,7 +58,9 @@ function App() {
       ]);
       setCartItems([]); // Clear local cart state
       setIsCartOpen(false);
+      showAlert("Wohoo! Your Order is Placed, We will be Served it shortly", "success")
     } catch (error) {
+      showAlert("Connot placed your order. Somethign went wrong!", "error")
       console.error("Error placing order:", error);
     }
   };
