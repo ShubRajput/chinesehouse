@@ -78,7 +78,7 @@ function App() {
       console.log("Fetched orders:", response);
       setOrders(response.orders); // Update the orders state with the fetched orders
     } catch (error) {
-      showAlert("error while fetching order", "error");
+      showAlert("No Orders Yet", "info");
       console.error("Error fetching orders:", error);
     }
   };
