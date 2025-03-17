@@ -78,6 +78,7 @@ function App() {
       console.log("Fetched orders:", response);
       setOrders(response.orders); // Update the orders state with the fetched orders
     } catch (error) {
+      showAlert("error while fetching order", "error");
       console.error("Error fetching orders:", error);
     }
   };
@@ -97,6 +98,7 @@ function App() {
         console.log("session token is :---->", sessionToken);
       }
     } catch (error) {
+      showAlert("Invalid Scan!", "error");
       console.error("Error creating session:", error);
     }
   };
